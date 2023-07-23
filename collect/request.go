@@ -20,12 +20,7 @@ type Property struct {
 
 // 一个任务实例，
 type Task struct {
-	Name        string // 用户界面显示的名称（应保证唯一性）
-	Url         string
-	Cookie      string
-	WaitTime    time.Duration
-	Reload      bool // 网站是否可以重复爬取
-	MaxDepth    int
+	Property
 	Visited     map[string]bool
 	VisitedLock sync.Mutex
 	Fetcher     Fetcher
@@ -37,26 +32,6 @@ type Context struct {
 	Req  *Request
 }
 
-func AddJsReqs(jreqs []map[string]interface{}) []*Request {
-	reqs := make([]*Request, 0)
-
-	for _, jreq := range jreqs {
-		req := &Request{}
-		u, ok := jreq["Url"].(string)
-		if !ok {
-			return nil
-		}
-
-		req.Url = u
-		req.RuleName, _ = jreq["RuleName"].(string)
-		req.Method, _ = jreq["Method"].(string)
-		req.Priority, _ = jreq["Priority"].(int64)
-		reqs = append(reqs, req)
-	}
-
-	return reqs
-}
-
 func (c *Context) ParseJSReg(name string, reg string) ParseResult {
 	re := regexp.MustCompile(reg)
 
@@ -64,7 +39,7 @@ func (c *Context) ParseJSReg(name string, reg string) ParseResult {
 	result := ParseResult{}
 
 	for _, m := range matches {
-		u := string(m[1])
+		u := string(m)
 		result.Requesrts = append(
 			result.Requesrts, &Request{
 				Method:   "GET",
@@ -78,7 +53,7 @@ func (c *Context) ParseJSReg(name string, reg string) ParseResult {
 	return result
 }
 
-func (c *Context) OutputJs(reg string) ParseResult {
+func (c *Context) OutputJS(reg string) ParseResult {
 	re := regexp.MustCompile(reg)
 	ok := re.Match(c.Body)
 
@@ -101,7 +76,7 @@ type Request struct {
 	Task     *Task
 	Url      string
 	Method   string
-	Depth    int
+	Depth    int64
 	Priority int64
 	RuleName string
 }
@@ -112,7 +87,7 @@ type ParseResult struct {
 }
 
 func (r *Request) Check() error {
-	if r.Depth > r.Task.MaxDepth {
+	if r.Depth > r.Task.Property.MaxDepth {
 		return errors.New("Max depth limit reached")
 	}
 	return nil

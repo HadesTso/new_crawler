@@ -26,7 +26,6 @@ func (BaseFetch) Get(req *Request) ([]byte, error) {
 	resp, err := http.Get(req.Url)
 
 	if err != nil {
-		fmt.Println(err)
 		return nil, err
 	}
 

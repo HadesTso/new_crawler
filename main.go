@@ -4,7 +4,6 @@ import (
 	"github.com/dreamerjackson/crawler/collect"
 	"github.com/dreamerjackson/crawler/engine"
 	"github.com/dreamerjackson/crawler/log"
-	"github.com/dreamerjackson/crawler/proxy"
 	"go.uber.org/zap/zapcore"
 	"time"
 )
@@ -16,21 +15,23 @@ func main() {
 	logger.Info("log init end")
 
 	// proxy
-	proxyURLs := []string{"http://127.0.0.1:8888", "http://127.0.0.1:8888"}
+	/*proxyURLs := []string{"http://127.0.0.1:8888", "http://127.0.0.1:8888"}
 	p, err := proxy.RoundRobinProxySwitcher(proxyURLs...)
 	if err != nil {
 		logger.Error("RoundRobinProxySwitcher failed")
-	}
+	}*/
 
 	var f collect.Fetcher = &collect.BrowserFetch{
 		Timeout: 3000 * time.Millisecond,
 		Logger:  logger,
-		Proxy:   p,
+		//Proxy:   p,
 	}
 	seeds := make([]*collect.Task, 0, 1000)
 
 	seeds = append(seeds, &collect.Task{
-		Name:    "find_douban_sun_room",
+		Property: collect.Property{
+			Name: "js_find_douban_sun_room",
+		},
 		Fetcher: f,
 	})
 
