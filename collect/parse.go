@@ -8,5 +8,6 @@ type RuleTree struct {
 
 // 采集规则节点
 type Rule struct {
-	ParseFunc func(*Context) (ParseResult, error) // 内容解析函数
+	ItemFields []string                            // 采集字段
+	ParseFunc  func(*Context) (ParseResult, error) // 内容解析函数
 }

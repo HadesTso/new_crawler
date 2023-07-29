@@ -2,6 +2,7 @@ package engine
 
 import (
 	"github.com/dreamerjackson/crawler/collect"
+	"github.com/dreamerjackson/crawler/parse/doubanbook"
 	"github.com/dreamerjackson/crawler/parse/doubangroup"
 	"github.com/robertkrimen/otto"
 	"go.uber.org/zap"
@@ -10,6 +11,7 @@ import (
 
 func init() {
 	Store.Add(doubangroup.DoubangroupTask)
+	Store.Add(doubanbook.DoubanBookTask)
 	Store.AddJSTask(doubangroup.DoubangroupJSTask)
 }
 
@@ -41,7 +43,7 @@ func (c *CrawlerStore) AddJSTask(m *collect.TaskModule) {
 			task.Rule.Trunk = make(map[string]*collect.Rule, 0)
 		}
 		task.Rule.Trunk[r.Name] = &collect.Rule{
-			parseFunc,
+			ParseFunc: parseFunc,
 		}
 
 		c.hash[task.Name] = task
